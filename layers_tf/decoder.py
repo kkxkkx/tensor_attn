@@ -209,18 +209,18 @@ class DecoderRNN(BaseRNNDecoder):
                      encoder_outputs=None,
                      input_valid_length=None):
 
-        # print('h')
-        # print(h)
-        # print('encoder_outputs')
-        # print(encoder_outputs)
-        hidden_with_time_axis = tf.expand_dims(h, 1)
+        print('h')
+        print(h.shape)
+        print('encoder_outputs')
+        print(encoder_outputs.shape)
+        query_with_time_axis = tf.expand_dims(h, 1)
         score = self.V(tf.nn.tanh(
-            self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
+            self.W1(query_with_time_axis) + self.W2(encoder_outputs)))
         attn_weights = tf.nn.softmax(score, axis=1)
         print('attn_weight')
-        print(attn_weights.shape())
+        print(attn_weights.shape)
         print('x')
-        print(x)
+        print(x.shape)
         context = attn_weights * x
         context = tf.reduce_sum(context, axis=1)
 
