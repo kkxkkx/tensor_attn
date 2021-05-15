@@ -302,7 +302,12 @@ class DecoderRNN(BaseRNNDecoder):
     def forward_step(self, x, h,
                      encoder_outputs=None,
                      input_valid_length=None):
-
+        print('x')
+        print(x)
+        print('h')
+        print(h)
+        print('encoder_outputs')
+        print(encoder_outputs)
         hidden_with_time_axis = tf.expand_dims(h, 1)
         score = self.V(tf.nn.tanh(
             self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
