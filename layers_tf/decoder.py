@@ -183,100 +183,6 @@ class DecoderRNN(BaseRNNDecoder):
     def __init__(self, vocab_size, embedding_size,
                  hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
                  dropout=0.0, word_drop=0.0,
-                 max_unroll=30, sample=True, temperature=1.0, beam_size=1):
-        super(DecoderRNN, self).__init__()
-
-        self.vocab_size = vocab_size
-        self.embedding_size = embedding_size
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-        self.dropout = dropout
-        self.temperature = temperature
-        self.word_drop = word_drop
-        self.max_unroll = max_unroll
-        self.sample = sample
-        self.training = True
-        self.beam_size = beam_size
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_size)
-        self.rnncell = rnncell(hidden_size)
-        self.out = tf.keras.layers.Dense(vocab_size)
-
-    def forward_step(self, x, h,
-                     encoder_outputs=None,
-                     input_valid_length=None):
-        # x: [batch_size] => [batch_size, hidden_size]
-        x = self.embed(x)
-
-        # last_h: [batch_size, hidden_size] (h from Top RNN layer)
-        # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-        last_h, h = self.rnncell(x, h)
-        out = self.out(last_h)
-        return out, h
-
-    def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
-             decode=False):
-        """
-                Train (decode=False)
-                    Args:
-                        inputs (Variable, LongTensor): [batch_size, seq_len]
-                        init_h: (Variable, FloatTensor): [num_layers, batch_size, hidden_size]
-                    Return:
-                        out   : [batch_size, seq_len, vocab_size]
-                Test (decode=True)
-                    Args:
-                        inputs: None
-                        init_h: (Variable, FloatTensor): [num_layers, batch_size, hidden_size]
-                    Return:
-                        out   : [batch_size, seq_len]
-                """
-        batch_size = self.batch_size(inputs, init_h)
-
-        # x: [batch_size]
-        x = self.init_token(batch_size, SOS_ID)
-
-        # h: [num_layers, batch_size, hidden_size]
-        h = self.init_h(batch_size, hidden=init_h)
-
-        if not decode:
-            out_list = []
-            seq_len = inputs.shape[1]
-            for i in range(seq_len):
-                # x: [batch_size]
-                # =>
-                # out: [batch_size, vocab_size]
-                # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h)
-
-                out_list.append(out)
-                x = inputs[:, i]
-
-            # [batch_size, max_target_len, vocab_size]
-            out_list = tf.convert_to_tensor(out_list)
-            out = tf.transpose(out_list, [1, 0, 2])
-
-            return out
-        else:
-            x_list = []
-            for i in range(self.max_unroll):
-                # x: [batch_size]
-                # =>
-                # out: [batch_size, vocab_size]
-                # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h)
-
-                # out: [batch_size, vocab_size]
-                # => x: [batch_size]
-                x = self.decode(out)
-                x_list.append(x)
-
-            # [batch_size, max_target_len]
-            return tf.stack(x_list, axis=1)
-
-
-class DecoderRNN(BaseRNNDecoder):
-    def __init__(self, vocab_size, embedding_size,
-                 hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
-                 dropout=0.0, word_drop=0.0,
                  max_unroll=30, sample=True, temperature=1.0, beam_size=1, encoder_outputs=None):
         super(DecoderRNN, self).__init__()
 
@@ -312,7 +218,7 @@ class DecoderRNN(BaseRNNDecoder):
             self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
         attn_weights = tf.nn.softmax(score, axis=1)
         print('attn_weight')
-        print(attn_weights)
+        print(attn_weights.shape())
         print('x')
         print(x)
         context = attn_weights * x
