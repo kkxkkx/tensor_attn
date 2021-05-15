@@ -277,7 +277,7 @@ class DecoderRNN(BaseRNNDecoder):
     def __init__(self, vocab_size, embedding_size,
                  hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
                  dropout=0.0, word_drop=0.0,
-                 max_unroll=30, sample=True, temperature=1.0, beam_size=1,encoder_outputs=None):
+                 max_unroll=30, sample=True, temperature=1.0, beam_size=1, encoder_outputs=None):
         super(DecoderRNN, self).__init__()
 
         self.vocab_size = vocab_size
@@ -356,7 +356,7 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h)
+                out, h = self.forward_step(x, h, encoder_outputs)
 
                 out_list.append(out)
                 x = inputs[:, i]
