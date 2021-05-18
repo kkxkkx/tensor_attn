@@ -250,11 +250,12 @@ class DecoderRNN(BaseRNNDecoder):
         attention_weights = tf.nn.softmax(score, axis=1)
         #context=[32,271,512]
         context_vector = attention_weights * encoder_outputs
-        print('x_b')
-        print(x.shape)
+
         # x: [batch_size] => [batch_size, hidden_size]
+        # x=[271,] -> [271,300]
         x = self.embed(x)
-        print('x_a')
+        x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
+        print('x_b')
         print(x.shape)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
