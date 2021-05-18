@@ -238,6 +238,8 @@ class DecoderRNN(BaseRNNDecoder):
                      encoder_outputs=None,
                      encoder_hidden=None,
                      input_valid_length=None):
+        print('encoder_outputs')
+        print(encoder_outputs.shape)
         # encoder_outputs=[batch_size, max_seq_len, hidden_size]
         # [271,512]
         # encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
