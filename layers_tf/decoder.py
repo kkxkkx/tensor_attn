@@ -222,7 +222,7 @@ class DecoderRNN(BaseRNNDecoder):
         self.beam_size = beam_size
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_size)
         self.rnncell = rnncell(hidden_size)
-        self.attention = BahdanauAttention(self.hidden_size)
+        # self.attention = BahdanauAttention(self.hidden_size)
         self.out = tf.keras.layers.Dense(vocab_size)
 
     def forward_step(self, x, h,
