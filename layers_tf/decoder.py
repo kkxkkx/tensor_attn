@@ -1,7 +1,5 @@
 import random
 import numpy as np
-from tensorflow.contrib.quantization.python import array_ops
-from tensorflow.contrib.seq2seq import LuongAttention, BahdanauAttention, AttentionWrapper
 
 from .beam_search import Beam
 from utils_tf import SOS_ID, UNK_ID, EOS_ID
