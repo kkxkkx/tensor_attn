@@ -306,8 +306,9 @@ class DecoderRNN(BaseRNNDecoder):
         if not decode:
             out_list = []
             seq_len = inputs.shape[1]
-            print('seq_len')
-            print(seq_len)
+            # print('seq_len')
+            # print(seq_len)
+            #seq=50
             for i in range(seq_len):
                 # x: [batch_size]
                 # =>
@@ -316,6 +317,8 @@ class DecoderRNN(BaseRNNDecoder):
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
                 out_list.append(out)
                 x = inputs[:, i]
+                print('x')
+                print(x)
 
             # [batch_size, max_target_len, vocab_size]
             out_list = tf.convert_to_tensor(out_list)
