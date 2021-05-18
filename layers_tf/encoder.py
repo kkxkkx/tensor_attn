@@ -105,9 +105,21 @@ class ContextRNN(BaseRNNEncoder):
         seq_len = int(conversation_length[tf.argmax(conversation_length)])
         encoder_hidden = tf.slice(encoder_hidden, [0,0,0],[-1,seq_len,-1])*10
         mask = tf.sequence_mask(conversation_length,seq_len)
+        print('hidden_init前')
+        print(hidden.shape)
         hidden = self.init_h(batch_size, hidden)
+        print('encoder_hidden')
+        print(encoder_hidden.shape)
+        print('hidden')
+        print(hidden.shape)
         output, s = self.rnn(inputs=encoder_hidden, mask=mask, initial_state=hidden)
+        print('output')
+        print(output.shape)
+        print('s')
+        print(s.shape)
         state = tf.expand_dims(s, 1)
+        print('state')
+        print(state.shape)
         return output, state
 
     def step(self, encoder_hidden, hidden):
@@ -116,19 +128,8 @@ class ContextRNN(BaseRNNEncoder):
 
         if hidden is None:
             hidden = self.init_h(batch_size, hidden=None)
-        print('encoder_hidden')
-        print(encoder_hidden.shape)
-        print('hidden')
-        print(hidden.shape)
-
         output, s = self.rnn(inputs=encoder_hidden,  initial_state=hidden)
-        print('output')
-        print(output.shape)
-        print('s')
-        print(s.shape)
         state = tf.expand_dims(s, 1)
-        print('state')
-        print(state.shape)
         return output, state
 
 
