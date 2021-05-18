@@ -105,8 +105,6 @@ class ContextRNN(BaseRNNEncoder):
         seq_len = int(conversation_length[tf.argmax(conversation_length)])
         encoder_hidden = tf.slice(encoder_hidden, [0,0,0],[-1,seq_len,-1])*10
         mask = tf.sequence_mask(conversation_length,seq_len)
-        print('hidden_init前')
-        print(hidden.shape)
         hidden = self.init_h(batch_size, hidden)
         print('encoder_hidden')
         print(encoder_hidden.shape)
