@@ -232,7 +232,7 @@ class DecoderRNN(BaseRNNDecoder):
         #encoder_outputs=[batch_size, max_seq_len, hidden_size]
         #[271,512]
         #encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
-        #[32,9,1024]
+        #[32,9,512]
         print('encoder_output')
         print(encoder_outputs.shape)
         print('encoder_hidden')
