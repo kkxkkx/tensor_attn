@@ -251,12 +251,13 @@ class DecoderRNN(BaseRNNDecoder):
         attention_weights = tf.nn.softmax(score, axis=1)
         # context=[32,271,512]
         context_vector = attention_weights * encoder_outputs
-        context_vector = tf.reduce_sum(context_vector, axis=1)
-        print('context_vector')
-        print(context_vector.shape)
+        # context=[32,512]
+        # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
+        context_vector = tf.reduce_sum(context_vector, axis=0)
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
+        # x=[271,1,300]
         x = tf.expand_dims(x, 1)
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
         print('x_b')
