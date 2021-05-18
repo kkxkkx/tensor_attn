@@ -261,7 +261,6 @@ class DecoderRNN(BaseRNNDecoder):
         # x = tf.expand_dims(x, 1)
         # x= [271,1,812]
         # x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
-        print(h.size)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         # last_h=[271,271,512]
