@@ -178,6 +178,7 @@ class BaseRNNDecoder(tf.keras.Model):
 
         return embed
 
+
 class BahdanauAttention(tf.keras.Model):
     def __init__(self, units):
         super(BahdanauAttention, self).__init__()
@@ -228,7 +229,8 @@ class DecoderRNN(BaseRNNDecoder):
                      encoder_outputs=None,
                      encoder_hidden=None,
                      input_valid_length=None):
-
+        #encoder_outputs=[batch_size, max_seq_len, hidden_size]
+        #encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
         context, attention_w = self.attention(encoder_hidden, encoder_outputs)
         # x: [batch_size] => [batch_size, hidden_size]
         x = self.embed(x)
@@ -245,9 +247,14 @@ class DecoderRNN(BaseRNNDecoder):
                 Train (decode=False)
                     Args:
                         inputs (Variable, LongTensor): [batch_size, seq_len]
-                        init是encoder_hidden的隐藏层
+                        init_h: [num_layers*num_directions, batch_size, hidden_size]
                         init_h: (Variable, FloatTensor): [num_layers, batch_size, hidden_size]
-                        encoder_outputs
+
+                        init_h: ((tuple of) Variable): [num_layers*num_directions, batch_size, hidden_size]
+                        - last hidden state
+                        - (h, c) or h
+                        encoder_outputs(Variable): [batch_size, max_seq_len, hidden_size]
+                        - list of all hidden states
                     Return:
                         out   : [batch_size, seq_len, vocab_size]
                 Test (decode=True)
@@ -263,8 +270,10 @@ class DecoderRNN(BaseRNNDecoder):
         # x: [batch_size]
         x = self.init_token(batch_size, SOS_ID)
 
+        #decoder_init=[num_layers, batch_size, hidden_size]
+        decoder_init = tf.reshape(encoder_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
         # h: [num_layers, batch_size, hidden_size]
-        h = self.init_h(batch_size, hidden=init_h)
+        h = self.init_h(batch_size, hidden=decoder_init)
 
         if not decode:
             out_list = []
