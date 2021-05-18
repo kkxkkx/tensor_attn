@@ -238,11 +238,15 @@ class DecoderRNN(BaseRNNDecoder):
                      encoder_outputs=None,
                      encoder_hidden=None,
                      input_valid_length=None):
+        print('encoder_hidden')
+        print(encoder_hidden.shape)
+        print('encoder_outputs')
+        print(encoder_outputs.shape)
         # [271,512]
         # encoder_outputs=[batch_size, max_seq_len, hidden_size]
         # [271,512]
         # encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
-        # [32,9,512]
+        # [32,1,512]
         # hidden_with_time_axis shape == (batch_size, 1, hidden size)
         print(encoder_hidden.shape)
         hidden_with_time_axis = encoder_hidden
