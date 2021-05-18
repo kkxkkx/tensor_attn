@@ -305,7 +305,7 @@ class DecoderRNN(BaseRNNDecoder):
         decoder_init = tf.reshape(encoder_outputs, [self.num_layers, -1, self.hidden_size])
         # h: [num_layers, batch_size, hidden_size]
         print('decoder_init')
-        print(decoder_init)
+        print(decoder_init.shape)
         h = self.init_h(batch_size, hidden=decoder_init)
         print('h')
         print(h)
