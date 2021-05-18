@@ -92,7 +92,7 @@ class HRED(tf.keras.Model):
         # max_len=9
         # context_outputs=[32,9,512]
         # context_hidden=[32,1,512]
-        print(input_conversation_length)
+        # print(input_conversation_length)
         context_outputs, context_hidden = self.context_encoder(comb_encoder_hidden, input_conversation_length)
         # context_outputs=[271,512]
         context_outputs = tf.concat([context_outputs[i, :int(l), :]
