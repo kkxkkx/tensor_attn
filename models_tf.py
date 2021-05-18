@@ -88,18 +88,15 @@ class HRED(tf.keras.Model):
         encoder_hidden = tf.stack([pad(encoder_hidden[int(s):int(s+l)], max_len)
                                       for s, l in zip(start, input_conversation_length)], 0)
         comb_encoder_hidden = tf.concat([encoder_hidden, img_encoder_outputs], 2)
+        # context_outputs=[32,9,512]
         context_outputs, context_hidden = self.context_encoder(comb_encoder_hidden, input_conversation_length)
-        print('context_output_begin')
-        print(context_outputs.shape)
+        # context_outputs=[271,512]
         context_outputs = tf.concat([context_outputs[i, :int(l), :]
                                      for i, l in enumerate(input_conversation_length)], 0)
-        print('context_output_b')
-        print(context_outputs.shape)
+        # context_output=[271,512]
         context_outputs = self.feedforward(context_outputs)
-        print('context_output_a')
-        print(context_outputs.shape)
         decoder_init = tf.reshape(context_outputs,[self.decoder.num_layers, -1, self.decoder.hidden_size])
-
+        print(decoder_init.shape)
         if not decode:
             decoder_outputs = self.decoder(target_sentences,
                                            encoder_outputs=context_outputs,
