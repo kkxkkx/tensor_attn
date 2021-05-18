@@ -253,9 +253,7 @@ class DecoderRNN(BaseRNNDecoder):
         context_vector = attention_weights * encoder_outputs
         # context=[32,512]
         # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
-        context_vector = tf.reduce_sum(context_vector, axis=1)
-        print('context_vector')
-        print(context_vector.shape)
+        context_vector = tf.reduce_sum(context_vector, axis=0)
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
@@ -299,19 +297,17 @@ class DecoderRNN(BaseRNNDecoder):
 
         # x: [batch_size]
         x = self.init_token(batch_size, SOS_ID)
-        print('x')
-        print(x)
         # decoder_init=[num_layers, batch_size, hidden_size]
+        # decoder_init=[1,271,512]
         decoder_init = tf.reshape(encoder_outputs, [self.num_layers, -1, self.hidden_size])
         # h: [num_layers, batch_size, hidden_size]
-        print('decoder_init')
-        print(decoder_init.shape)
+        # h=[1,271,512]
         h = self.init_h(batch_size, hidden=decoder_init)
-        print('h')
-        print(h)
         if not decode:
             out_list = []
             seq_len = inputs.shape[1]
+            print('seq_len')
+            print(seq_len)
             for i in range(seq_len):
                 # x: [batch_size]
                 # =>
