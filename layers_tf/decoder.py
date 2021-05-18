@@ -244,16 +244,17 @@ class DecoderRNN(BaseRNNDecoder):
         # [32,9,512]
         # hidden_with_time_axis shape == (batch_size, 1, hidden size)
         hidden_with_time_axis = encoder_hidden
-        #score=[32,271,1]
+        # score=[32,271,1]
         score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
-        #attention=[32,271,1]
+        # attention=[32,271,1]
         attention_weights = tf.nn.softmax(score, axis=1)
-        #context=[32,271,512]
+        # context=[32,271,512]
         context_vector = attention_weights * encoder_outputs
 
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
+        x = tf.expand_dims(x, 1)
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
         print('x_b')
         print(x.shape)
@@ -288,7 +289,6 @@ class DecoderRNN(BaseRNNDecoder):
                 """
         # decoder_init = tf.reshape(encoder_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
         batch_size = self.batch_size(inputs, init_h)
-
 
         # x: [batch_size]
         x = self.init_token(batch_size, SOS_ID)
