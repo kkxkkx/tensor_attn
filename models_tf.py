@@ -18,7 +18,8 @@ class HRED(tf.keras.Model):
                                          config.embedding_size,
                                          config.encoder_hidden_size,
                                          dropout=config.dropout,
-                                         bidirectional=config.bidirectional)
+                                         bidirectional=config.bidirectional
+                                        )
         context_input_size = (config.num_layers
                               * config.encoder_hidden_size
                               * self.encoder.num_directions)
@@ -41,6 +42,7 @@ class HRED(tf.keras.Model):
                                          temperature=config.temperature,
                                          beam_size=config.beam_size
                                         )
+        self.attention_type = 'Bahdanau'
         self.feedforward = tf.keras.layers.Dense(self.config.decoder_hidden_size,self.config.activation)
 
         if config.tie_embedding:
@@ -86,7 +88,7 @@ class HRED(tf.keras.Model):
         encoder_hidden = tf.stack([pad(encoder_hidden[int(s):int(s+l)], max_len)
                                       for s, l in zip(start, input_conversation_length)], 0)
         comb_encoder_hidden = tf.concat([encoder_hidden, img_encoder_outputs], 2)
-        context_outputs, _ = self.context_encoder(comb_encoder_hidden, input_conversation_length)
+        context_outputs, context_hidden = self.context_encoder(comb_encoder_hidden, input_conversation_length)
         context_outputs = tf.concat([context_outputs[i, :int(l), :]
                                      for i, l in enumerate(input_conversation_length)], 0)
 
@@ -96,7 +98,7 @@ class HRED(tf.keras.Model):
         if not decode:
             decoder_outputs = self.decoder(target_sentences,
                                            encoder_outputs=context_outputs,
-                                           init_h=decoder_init,
+                                           init_h=encoder_hidden,
                                            decode=decode)
             return decoder_outputs
         else:

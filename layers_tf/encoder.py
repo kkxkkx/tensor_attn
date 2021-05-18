@@ -70,7 +70,6 @@ class EncoderRNN(BaseRNNEncoder):
             state = tf.expand_dims(s,1)
         return output[0], state
 
-
 class ContextRNN(BaseRNNEncoder):
     def __init__(self, input_size, context_size, rnn=GRU, dropout=0.0,
                  bias=True, batch_first=True,num_layers=1):

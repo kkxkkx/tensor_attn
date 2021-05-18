@@ -1,5 +1,7 @@
 import random
 import numpy as np
+from tensorflow.contrib.quantization.python import array_ops
+from tensorflow.contrib.seq2seq import LuongAttention, BahdanauAttention, AttentionWrapper
 
 from .beam_search import Beam
 from utils_tf import SOS_ID, UNK_ID, EOS_ID
@@ -273,11 +275,34 @@ class DecoderRNN(BaseRNNDecoder):
             return tf.stack(x_list, axis=1)
 
 
+class BahdanauAttention(tf.keras.Model):
+    def __init__(self, units):
+        super(BahdanauAttention, self).__init__()
+        self.W1 = tf.keras.layers.Dense(units)
+        self.W2 = tf.keras.layers.Dense(units)
+        self.V = tf.keras.layers.Dense(1)
+
+    def call(self, query, values):
+        # value是编码器中输出的结果
+        # query是编码器中输出的隐层向量
+        hidden_with_time_axis = tf.expand_dims(query, 1)
+
+        score = self.V(tf.nn.tanh(
+            self.W1(values) + self.W2(hidden_with_time_axis)))
+
+        attention_weights = tf.nn.softmax(score, axis=1)
+
+        context_vector = attention_weights * values
+        context_vector = tf.reduce_sum(context_vector, axis=1)
+
+        return context_vector, attention_weights
+
+
 class DecoderRNN(BaseRNNDecoder):
     def __init__(self, vocab_size, embedding_size,
                  hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
                  dropout=0.0, word_drop=0.0,
-                 max_unroll=30, sample=True, temperature=1.0, beam_size=1,encoder_outputs=None):
+                 max_unroll=30, sample=True, temperature=1.0, beam_size=1, encoder_outputs=None):
         super(DecoderRNN, self).__init__()
 
         self.vocab_size = vocab_size
@@ -293,23 +318,15 @@ class DecoderRNN(BaseRNNDecoder):
         self.beam_size = beam_size
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_size)
         self.rnncell = rnncell(hidden_size)
+        self.attention = BahdanauAttention(self.hidden_size)
         self.out = tf.keras.layers.Dense(vocab_size)
-        # 注意力机制
-        self.W1 = tf.keras.layers.Dense(self.hidden_size)
-        self.W2 = tf.keras.layers.Dense(self.hidden_size)
-        self.V = tf.keras.layers.Dense(1)
 
     def forward_step(self, x, h,
                      encoder_outputs=None,
+                     encoder_hidden=None,
                      input_valid_length=None):
 
-        hidden_with_time_axis = tf.expand_dims(h, 1)
-        score = self.V(tf.nn.tanh(
-            self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
-        attn_weights = tf.nn.softmax(score, axis=1)
-        context = attn_weights * x
-        context = tf.reduce_sum(context, axis=1)
-
+        context, attention_w = self.attention(encoder_hidden, encoder_outputs)
         # x: [batch_size] => [batch_size, hidden_size]
         x = self.embed(x)
         x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
@@ -317,7 +334,7 @@ class DecoderRNN(BaseRNNDecoder):
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         last_h, h = self.rnncell(x, h)
         out = self.out(last_h)
-        return out, h
+        return out, h, attention_w
 
     def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
              decode=False):
@@ -325,7 +342,9 @@ class DecoderRNN(BaseRNNDecoder):
                 Train (decode=False)
                     Args:
                         inputs (Variable, LongTensor): [batch_size, seq_len]
+                        init是encoder_hidden的隐藏层
                         init_h: (Variable, FloatTensor): [num_layers, batch_size, hidden_size]
+                        encoder_outputs
                     Return:
                         out   : [batch_size, seq_len, vocab_size]
                 Test (decode=True)
@@ -335,6 +354,7 @@ class DecoderRNN(BaseRNNDecoder):
                     Return:
                         out   : [batch_size, seq_len]
                 """
+        # decoder_init = tf.reshape(encoder_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
         batch_size = self.batch_size(inputs, init_h)
 
         # x: [batch_size]
@@ -351,8 +371,8 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h)
-
+                out, h,attn = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
+                print(attn)
                 out_list.append(out)
                 x = inputs[:, i]
 
