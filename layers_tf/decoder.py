@@ -299,12 +299,16 @@ class DecoderRNN(BaseRNNDecoder):
 
         # x: [batch_size]
         x = self.init_token(batch_size, SOS_ID)
-
+        print('x')
+        print(x)
         # decoder_init=[num_layers, batch_size, hidden_size]
         decoder_init = tf.reshape(encoder_outputs, [self.num_layers, -1, self.hidden_size])
         # h: [num_layers, batch_size, hidden_size]
+        print('decoder_init')
+        print(decoder_init)
         h = self.init_h(batch_size, hidden=decoder_init)
-
+        print('h')
+        print(h)
         if not decode:
             out_list = []
             seq_len = inputs.shape[1]
