@@ -98,7 +98,7 @@ class HRED(tf.keras.Model):
         if not decode:
             decoder_outputs = self.decoder(target_sentences,
                                            encoder_outputs=context_outputs,
-                                           init_h=encoder_hidden,
+                                           init_h=context_hidden,
                                            decode=decode)
             return decoder_outputs
         else:

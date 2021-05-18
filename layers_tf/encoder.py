@@ -103,20 +103,16 @@ class ContextRNN(BaseRNNEncoder):
         batch_size, seq_len, _ = encoder_hidden.shape
         #取最大的seqlen
         seq_len = int(conversation_length[tf.argmax(conversation_length)])
+        #encoder_hiddden=[32,9,2048]
         encoder_hidden = tf.slice(encoder_hidden, [0,0,0],[-1,seq_len,-1])*10
         mask = tf.sequence_mask(conversation_length,seq_len)
         #list
         hidden = self.init_h(batch_size, hidden)
-        print('encoder_hidden')
-        print(encoder_hidden.shape)
+        #output=[32,9,312]
+        #s=[32,512]
         output, s = self.rnn(inputs=encoder_hidden, mask=mask, initial_state=hidden)
-        print('output')
-        print(output.shape)
-        print('s')
-        print(s.shape)
+        #state=[32,1,512]
         state = tf.expand_dims(s, 1)
-        print('state')
-        print(state.shape)
         return output, state
 
     def step(self, encoder_hidden, hidden):
