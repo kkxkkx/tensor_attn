@@ -260,8 +260,8 @@ class DecoderRNN(BaseRNNDecoder):
         # x=[271,1,300]
         x = tf.expand_dims(x, 1)
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
-        print('x_b')
-        print(x.shape)
+        # print('x_b')
+        # print(x.shape)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         last_h, h = self.rnncell(x, h)
@@ -311,8 +311,6 @@ class DecoderRNN(BaseRNNDecoder):
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
-                print('h')
-                print(h)
                 out_list.append(out)
                 x = inputs[:, i]
 
