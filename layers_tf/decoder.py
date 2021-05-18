@@ -231,15 +231,19 @@ class DecoderRNN(BaseRNNDecoder):
                      input_valid_length=None):
         #encoder_outputs=[batch_size, max_seq_len, hidden_size]
         #encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
-        context, attention_w = self.attention(encoder_hidden, encoder_outputs)
+        print('encoder_output')
+        print(encoder_outputs.shape)
+        print('encoder_hidden')
+        print(encoder_hidden.shape)
+        # context, attention_w = self.attention(encoder_hidden, encoder_outputs)
         # x: [batch_size] => [batch_size, hidden_size]
         x = self.embed(x)
-        x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
+        # x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         last_h, h = self.rnncell(x, h)
         out = self.out(last_h)
-        return out, h, attention_w
+        return out, h #, attention_w
 
     def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
              decode=False):
@@ -283,8 +287,8 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h,attn = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
-                print(attn)
+                out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
+                # print(attn)
                 out_list.append(out)
                 x = inputs[:, i]
 

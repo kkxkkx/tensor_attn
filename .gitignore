@@ -2,3 +2,4 @@
 data/
 ckpt/
 *.h5
+*.pyc
