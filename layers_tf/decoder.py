@@ -246,14 +246,14 @@ class DecoderRNN(BaseRNNDecoder):
         # hidden_with_time_axis shape == (batch_size, 1, hidden size)
         # hidden_with_time_axis = encoder_hidden
         # score=[32,271,1]
-        score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(h)))
-        # attention_weights=[32,271,1]
-        attention_weights = tf.nn.softmax(score, axis=1)
-        # context=[32,271,512]
-        context_vector = attention_weights * encoder_outputs
+        # score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(h[0])))
+        # # attention_weights=[32,271,1]
+        # attention_weights = tf.nn.softmax(score, axis=1)
+        # # context=[32,271,512]
+        # context_vector = attention_weights * encoder_outputs
         # context=[32,512]
         # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
-        context_vector = tf.reduce_sum(context_vector, axis=0)
+        # context_vector = tf.reduce_sum(context_vector, axis=0)
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
@@ -264,7 +264,11 @@ class DecoderRNN(BaseRNNDecoder):
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         # last_h=[271,271,512]
+        print('h[0]')
+        print(h[0])
         last_h, h = self.rnncell(x, h)
+        print('h[0]-------------')
+        print(h[0])
         # out=[271,271,20000]
         out = self.out(last_h)
         return out, h  # , attention_w
@@ -314,6 +318,7 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
+
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
                 out_list.append(out)
                 x = inputs[:, i]
