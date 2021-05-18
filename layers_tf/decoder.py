@@ -244,6 +244,7 @@ class DecoderRNN(BaseRNNDecoder):
         # encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
         # [32,9,512]
         # hidden_with_time_axis shape == (batch_size, 1, hidden size)
+        print(encoder_hidden.shape)
         hidden_with_time_axis = encoder_hidden
         # score=[32,271,1]
         score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
@@ -268,8 +269,6 @@ class DecoderRNN(BaseRNNDecoder):
         last_h, h = self.rnncell(x, h)
         print('last_h')
         print(last_h.shape)
-        print('h')
-        print(h.shape)
         # out=[271,271,20000]
         out = self.out(last_h)
         print('out')
