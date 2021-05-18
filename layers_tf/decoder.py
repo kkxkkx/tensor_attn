@@ -307,7 +307,8 @@ class DecoderRNN(BaseRNNDecoder):
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
-                # print(attn)
+                print('h')
+                print(h)
                 out_list.append(out)
                 x = inputs[:, i]
 
