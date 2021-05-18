@@ -244,11 +244,10 @@ class DecoderRNN(BaseRNNDecoder):
         print(encoder_outputs.shape)
         # [271,512]
         # encoder_outputs=[batch_size, max_seq_len, hidden_size]
-        # [271,512]
+        # [32,1,512]
         # encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
         # [32,1,512]
         # hidden_with_time_axis shape == (batch_size, 1, hidden size)
-        print(encoder_hidden.shape)
         hidden_with_time_axis = encoder_hidden
         # score=[32,271,1]
         score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
@@ -266,7 +265,7 @@ class DecoderRNN(BaseRNNDecoder):
         # x = tf.expand_dims(x, 1)
         # x= [271,1,812]
         # x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
-
+        print(h.size)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         # last_h=[271,271,512]
