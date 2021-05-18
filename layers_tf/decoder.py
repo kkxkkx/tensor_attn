@@ -187,6 +187,10 @@ class BahdanauAttention(tf.keras.Model):
         self.V = tf.keras.layers.Dense(1)
 
     def call(self, query, values):
+        #query=[batch_size, max_seq_len, hidden_size]
+        #[271,512]
+        #value=[num_layers*num_directions, batch_size, hidden_size]
+        #[32,9,512]
         # value是编码器中输出的结果
         # query是编码器中输出的隐层向量
         hidden_with_time_axis = tf.expand_dims(query, 1)
