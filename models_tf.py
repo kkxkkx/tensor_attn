@@ -87,6 +87,8 @@ class HRED(tf.keras.Model):
         # encoder_hidden: [batch_size, max_len, num_layers * direction * hidden_size]
         encoder_hidden = tf.stack([pad(encoder_hidden[int(s):int(s+l)], max_len)
                                       for s, l in zip(start, input_conversation_length)], 0)
+        print('encoder_hidden')
+        print(encoder_hidden.shape)
         #comb_encoder_hidden=[32,9,2048]
         comb_encoder_hidden = tf.concat([encoder_hidden, img_encoder_outputs], 2)
         # max_len=9
@@ -94,11 +96,11 @@ class HRED(tf.keras.Model):
         # context_hidden=[32,1,512]
         # print(input_conversation_length)
         context_outputs, context_hidden = self.context_encoder(comb_encoder_hidden, input_conversation_length)
-        # context_outputs=[271,512]
-        context_outputs = tf.concat([context_outputs[i, :int(l), :]
-                                     for i, l in enumerate(input_conversation_length)], 0)
-        # context_output=[271,512]
-        context_outputs = self.feedforward(context_outputs)
+        # # context_outputs=[271,512]
+        # context_outputs = tf.concat([context_outputs[i, :int(l), :]
+        #                              for i, l in enumerate(input_conversation_length)], 0)
+        # # context_output=[271,512]
+        # context_outputs = self.feedforward(context_outputs)
         #decoder_init=[1,275,512]
         decoder_init = tf.reshape(context_outputs,[self.decoder.num_layers, -1, self.decoder.hidden_size])
         # print(decoder_init.shape)

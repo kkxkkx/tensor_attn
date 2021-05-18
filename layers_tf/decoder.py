@@ -238,10 +238,6 @@ class DecoderRNN(BaseRNNDecoder):
                      encoder_outputs=None,
                      encoder_hidden=None,
                      input_valid_length=None):
-        print('encoder_hidden')
-        print(encoder_hidden.shape)
-        print('encoder_outputs')
-        print(encoder_outputs.shape)
         # [271,512]
         # encoder_outputs=[batch_size, max_seq_len, hidden_size]
         # [32,1,512]
@@ -270,12 +266,8 @@ class DecoderRNN(BaseRNNDecoder):
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         # last_h=[271,271,512]
         last_h, h = self.rnncell(x, h)
-        print('last_h')
-        print(last_h.shape)
         # out=[271,271,20000]
         out = self.out(last_h)
-        print('out')
-        print(out.shape)
         return out, h  # , attention_w
 
     def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
