@@ -268,6 +268,8 @@ class DecoderRNN(BaseRNNDecoder):
         last_h, h = self.rnncell(x, h)
         # out=[271,271,20000]
         out = self.out(last_h)
+        print('out')
+        print(out.shape)
         return out, h  # , attention_w
 
     def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
