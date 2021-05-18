@@ -233,10 +233,10 @@ class DecoderRNN(BaseRNNDecoder):
         #[271,512]
         #encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
         #[32,9,512]
-        print('encoder_output')
-        print(encoder_outputs.shape)
-        print('encoder_hidden')
-        print(encoder_hidden.shape)
+        # print('encoder_output')
+        # print(encoder_outputs.shape)
+        # print('encoder_hidden')
+        # print(encoder_hidden.shape)
         # context, attention_w = self.attention(encoder_hidden, encoder_outputs)
         # x: [batch_size] => [batch_size, hidden_size]
         x = self.embed(x)
