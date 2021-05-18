@@ -12,14 +12,14 @@ def loadpickle(fname):
 
 
 if __name__ == '__main__':
-    gpus = tf.config.list_physical_devices("GPU")
-    if gpus:
-        gpu0 = gpus[3] #如果有多个GPU，仅使用第0个GPU
-        tf.config.experimental.set_memory_growth(gpu0, True) #设置GPU显存用量按需使用
-        tf.config.set_visible_devices([gpu0],"GPU") 
-        print('use gpu ')
-    else:
-        print('use cpu')
+    # gpus = tf.config.list_physical_devices("GPU")
+    # if gpus:
+    #     gpu0 = gpus[3] #如果有多个GPU，仅使用第0个GPU
+    #     tf.config.experimental.set_memory_growth(gpu0, True) #设置GPU显存用量按需使用
+    #     tf.config.set_visible_devices([gpu0],"GPU")
+    #     print('use gpu ')
+    # else:
+    #     print('use cpu')
     config = get_config(mode='train')
     val_config = get_config(mode='dev')
     print(config)

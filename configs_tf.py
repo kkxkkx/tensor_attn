@@ -57,7 +57,7 @@ class Config(object):
         self.pred_path = './pred/res_img_tf.txt'
         # Save path
         if self.mode == 'train' and self.checkpoint is None:
-            time_now = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+            time_now = datetime.now().strftime('%Y-%m-%d')
             self.save_path = save_dir.joinpath(self.data, self.model+'_tf', time_now)
             self.save_path=str(self.save_path).replace('\\','/')
             self.logdir = self.save_path

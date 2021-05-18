@@ -100,6 +100,8 @@ class ContextRNN(BaseRNNEncoder):
                         - last hidden state
                         - (h, c) or h
         """
+        #batch_size=32
+        #seq_len=9
         batch_size, seq_len, _ = encoder_hidden.shape
         #取最大的seqlen
         seq_len = int(conversation_length[tf.argmax(conversation_length)])

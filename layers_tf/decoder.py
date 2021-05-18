@@ -187,10 +187,10 @@ class BahdanauAttention(tf.keras.Model):
         self.V = tf.keras.layers.Dense(1)
 
     def call(self, query, values):
-        #query=[batch_size, max_seq_len, hidden_size]
-        #[271,512]
-        #value=[num_layers*num_directions, batch_size, hidden_size]
-        #[32,9,512]
+        # query=[batch_size, max_seq_len, hidden_size]
+        # [271,512]
+        # value=[num_layers*num_directions, batch_size, hidden_size]
+        # [32,9,512]
         # value是编码器中输出的结果
         # query是编码器中输出的隐层向量
         hidden_with_time_axis = tf.expand_dims(query, 1)
@@ -226,30 +226,42 @@ class DecoderRNN(BaseRNNDecoder):
         self.beam_size = beam_size
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_size)
         self.rnncell = rnncell(hidden_size)
+
         self.attention = BahdanauAttention(self.hidden_size)
+        self.W1 = tf.keras.layers.Dense(self.hidden_size)
+        self.W2 = tf.keras.layers.Dense(self.hidden_size)
+        self.V = tf.keras.layers.Dense(1)
+
         self.out = tf.keras.layers.Dense(vocab_size)
 
     def forward_step(self, x, h,
                      encoder_outputs=None,
                      encoder_hidden=None,
                      input_valid_length=None):
-        #encoder_outputs=[batch_size, max_seq_len, hidden_size]
-        #[271,512]
-        #encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
-        #[32,9,512]
-        # print('encoder_output')
-        # print(encoder_outputs.shape)
-        # print('encoder_hidden')
-        # print(encoder_hidden.shape)
-        # context, attention_w = self.attention(encoder_hidden, encoder_outputs)
+        # encoder_outputs=[batch_size, max_seq_len, hidden_size]
+        # [271,512]
+        # encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
+        # [32,9,512]
+        # hidden_with_time_axis shape == (batch_size, 1, hidden size)
+        hidden_with_time_axis = encoder_hidden
+        score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
+        print('score')
+        print(score.shape)
+        attention_weights = tf.nn.softmax(score, axis=1)
+        print('attention_weights')
+        print(attention_weights.shape)
+        context_vector = attention_weights * encoder_outputs
+        print('context_vector')
+        print(context_vector.shape)
         # x: [batch_size] => [batch_size, hidden_size]
         x = self.embed(x)
+        # x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
         # x = tf.concat([tf.expand_dims(context, 1), x], axis=-1)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         last_h, h = self.rnncell(x, h)
         out = self.out(last_h)
-        return out, h #, attention_w
+        return out, h  # , attention_w
 
     def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
              decode=False):
@@ -277,10 +289,11 @@ class DecoderRNN(BaseRNNDecoder):
         # decoder_init = tf.reshape(encoder_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
         batch_size = self.batch_size(inputs, init_h)
 
+
         # x: [batch_size]
         x = self.init_token(batch_size, SOS_ID)
 
-        #decoder_init=[num_layers, batch_size, hidden_size]
+        # decoder_init=[num_layers, batch_size, hidden_size]
         decoder_init = tf.reshape(encoder_outputs, [self.num_layers, -1, self.hidden_size])
         # h: [num_layers, batch_size, hidden_size]
         h = self.init_h(batch_size, hidden=decoder_init)
