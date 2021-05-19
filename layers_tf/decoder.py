@@ -254,8 +254,7 @@ class DecoderRNN(BaseRNNDecoder):
         attention_weights = tf.nn.softmax(score, axis=1)
         # context=[32,271,512]
         context_vector = attention_weights * encoder_outputs
-        print('context_vector')
-        print(context_vector.shape)
+        # [271,271,512]
         # context=[32,512]
         # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
         # context_vector = tf.reduce_sum(context_vector, axis=0)
