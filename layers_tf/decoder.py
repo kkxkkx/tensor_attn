@@ -253,7 +253,7 @@ class DecoderRNN(BaseRNNDecoder):
         context_vector = attention_weights * encoder_outputs
         # context=[32,512]
         # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
-        context_vector = tf.reduce_sum(context_vector, axis=0)
+        # context_vector = tf.reduce_sum(context_vector, axis=0)
         print(context_vector.shape)
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
@@ -262,7 +262,7 @@ class DecoderRNN(BaseRNNDecoder):
         # x = tf.expand_dims(x, 1)
         # x = [271,821]
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
-        x.reshape(271,300)
+        # x.reshape(271,300)
         # print('x_b')
         # print(x.shape)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
