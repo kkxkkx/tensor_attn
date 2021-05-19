@@ -259,7 +259,7 @@ class DecoderRNN(BaseRNNDecoder):
         # x=[271,] -> [271,300]
         # x = self.embed(x)
         # x=[271,1,300]
-        x = tf.expand_dims(x, 1)
+        x = tf.expand_dims(x, 1, 1)
         print('x')
         print(x.shape)
         # x= [271,1,812]
@@ -314,7 +314,7 @@ class DecoderRNN(BaseRNNDecoder):
             seq_len = inputs.shape[1]
             # print('seq_len')
             # print(seq_len)
-            #seq=50
+            # seq=50
             for i in range(seq_len):
                 # x: [batch_size]
                 # =>
