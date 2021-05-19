@@ -178,34 +178,6 @@ class BaseRNNDecoder(tf.keras.Model):
 
         return embed
 
-
-class BahdanauAttention(tf.keras.Model):
-    def __init__(self, units):
-        super(BahdanauAttention, self).__init__()
-        self.W1 = tf.keras.layers.Dense(units)
-        self.W2 = tf.keras.layers.Dense(units)
-        self.V = tf.keras.layers.Dense(1)
-
-    def call(self, query, values):
-        # query=[batch_size, max_seq_len, hidden_size]
-        # [271,512]
-        # value=[num_layers*num_directions, batch_size, hidden_size]
-        # [32,9,512]
-        # value是编码器中输出的结果
-        # query是编码器中输出的隐层向量
-        hidden_with_time_axis = tf.expand_dims(query, 1)
-
-        score = self.V(tf.nn.tanh(
-            self.W1(values) + self.W2(hidden_with_time_axis)))
-
-        attention_weights = tf.nn.softmax(score, axis=1)
-
-        context_vector = attention_weights * values
-        context_vector = tf.reduce_sum(context_vector, axis=1)
-
-        return context_vector, attention_weights
-
-
 class DecoderRNN(BaseRNNDecoder):
     def __init__(self, vocab_size, embedding_size,
                  hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
@@ -227,7 +199,6 @@ class DecoderRNN(BaseRNNDecoder):
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_size)
         self.rnncell = rnncell(hidden_size)
 
-        self.attention = BahdanauAttention(self.hidden_size)
         self.W1 = tf.keras.layers.Dense(self.hidden_size)
         self.W2 = tf.keras.layers.Dense(self.hidden_size)
         self.V = tf.keras.layers.Dense(1)
