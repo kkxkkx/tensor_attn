@@ -246,7 +246,7 @@ class DecoderRNN(BaseRNNDecoder):
         # hidden_with_time_axis shape == (batch_size, 1, hidden size)
         hidden_with_time_axis = encoder_hidden
         # score=[32,271,1]
-        score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(hidden_with_time_axis)))
+        score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(h[0])))
         # attention_weights=[32,271,1]
         attention_weights = tf.nn.softmax(score, axis=1)
         # context=[32,271,512]
@@ -254,11 +254,12 @@ class DecoderRNN(BaseRNNDecoder):
         # context=[32,512]
         # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
         context_vector = tf.reduce_sum(context_vector, axis=0)
+        print(context_vector.shape)
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
         # x=[271,1,300]
-        x = tf.expand_dims(x, 1)
+        # x = tf.expand_dims(x, 1)
         # x = [271,821]
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
         x.reshape(271,300)
