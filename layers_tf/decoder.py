@@ -255,16 +255,13 @@ class DecoderRNN(BaseRNNDecoder):
         # context=[32,512]
         # axis是轴的数字，本来应该是1 ，为了匹配维度，暂时修改成0
         context_vector = tf.reduce_sum(context_vector, axis=0)
-
+        print(context_vector.shape)
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
         # x=[271,1,300]
         x = tf.expand_dims(x, 1, 1)
         # x= [271,1,812]
-        y=tf.concat([tf.expand_dims(context_vector, 1), x])
-        print('y')
-        print(y.shape)
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
         print('x')
         print(x.shape)
