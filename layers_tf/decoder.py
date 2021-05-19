@@ -214,8 +214,8 @@ class DecoderRNN(BaseRNNDecoder):
         # [271,512]
         # encoder_hidden=[num_layers*num_directions, batch_size, hidden_size]
         # [32,9,512]
-        # hidden_with_time_axis shape == (batch_size, 1, hidden size)
-        hidden_with_time_axis = encoder_hidden
+        # # hidden_with_time_axis shape == (batch_size, 1, hidden size)
+        # hidden_with_time_axis = encoder_hidden
         # score=[32,271,1]
         score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(h[0])))
         # attention_weights=[32,271,1]
@@ -272,20 +272,19 @@ class DecoderRNN(BaseRNNDecoder):
         # x: [batch_size]
         x = self.init_token(batch_size, SOS_ID)
 
-        # decoder_init=[num_layers, batch_size, hidden_size]
-        decoder_init = tf.reshape(encoder_outputs, [self.num_layers, -1, self.hidden_size])
         # h: [num_layers, batch_size, hidden_size]
-        h = self.init_h(batch_size, hidden=decoder_init)
+        h = self.init_h(batch_size, hidden=init_h)
 
         if not decode:
             out_list = []
             seq_len = inputs.shape[1]
+            #seq_len=50
             for i in range(seq_len):
                 # x: [batch_size]
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs, encoder_hidden=init_h)
+                out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs)
                 out_list.append(out)
                 x = inputs[:, i]
 
