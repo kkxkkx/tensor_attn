@@ -228,6 +228,7 @@ class DecoderRNN(BaseRNNDecoder):
         self.rnncell = rnncell(hidden_size)
 
         self.attention = BahdanauAttention(self.hidden_size)
+
         self.W1 = tf.keras.layers.Dense(self.hidden_size)
         self.W2 = tf.keras.layers.Dense(self.hidden_size)
         self.V = tf.keras.layers.Dense(1)
@@ -257,19 +258,19 @@ class DecoderRNN(BaseRNNDecoder):
 
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
-        # x = self.embed(x)
+        x = self.embed(x)
         # x=[271,1,300]
         x = tf.expand_dims(x, 1, 1)
-        print('x')
-        print(x.shape)
         # x= [271,1,812]
+        y=tf.concat([tf.expand_dims(context_vector, 1), x])
+        print('y')
+        print(y.shape)
         x = tf.concat([tf.expand_dims(context_vector, 1), x], axis=-1)
         print('x')
         print(x.shape)
         # last_h: [batch_size, hidden_size] (h from Top RNN layer)
         # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
         # last_h=[271,271,512]
-
         last_h, h = self.rnncell(x, h)
         # out=[271,271,20000]
         out = self.out(last_h)
