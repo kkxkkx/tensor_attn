@@ -248,12 +248,12 @@ class DecoderRNN(BaseRNNDecoder):
         hidden_with_time_axis = encoder_hidden
         # score=[32,271,1]
         score = self.V(tf.nn.tanh(self.W1(encoder_outputs) + self.W2(h[0])))
+        print('score')
+        print(score.shape)
         # attention_weights=[32,271,1]
         attention_weights = tf.nn.softmax(score, axis=1)
         # context=[32,271,512]
         context_vector = attention_weights * encoder_outputs
-        size, _ = encoder_outputs.shape
-        context_vector = context_vector.reshape(size, self.hidden_size)
         print('context_vector')
         print(context_vector.shape)
         # context=[32,512]
