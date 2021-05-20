@@ -87,6 +87,12 @@ class BaseRNNDecoder(tf.keras.Model):
             # =>
             # out: [batch_size x beam_size, vocab_size]
             # h: [num_layers, batch_size x beam_size, hidden_size]
+            print('encoder_outputs')
+            print(encoder_outputs.shape)
+            print('x')
+            print(x.shape)
+            print('h')
+            print(h)
             out, h = self.forward_step(x, h,
                                        encoder_outputs=encoder_outputs,
                                        input_valid_length=input_valid_length)
