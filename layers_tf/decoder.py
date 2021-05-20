@@ -248,6 +248,16 @@ class DecoderRNN(BaseRNNDecoder):
         out = self.out(last_h)
         return out, h  # , attention_w
 
+    def step(self, x, h,
+                     encoder_outputs=None,
+                     encoder_hidden=None,
+                     input_valid_length=None):
+        x = self.embed(x)
+        last_h, h = self.rnncell(x, h)
+        out = self.out(last_h)
+        return out, h  # , attention_w
+
+
     def call(self, inputs, init_h=None, encoder_outputs=None, input_valid_length=None,
              decode=False):
         """
