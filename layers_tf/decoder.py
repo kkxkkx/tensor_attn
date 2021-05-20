@@ -87,15 +87,12 @@ class BaseRNNDecoder(tf.keras.Model):
             # =>
             # out: [batch_size x beam_size, vocab_size]
             # h: [num_layers, batch_size x beam_size, hidden_size]
-            print('encoder_outputs')
-            print(encoder_outputs.shape)
-            print('x')
-            print(x.shape)
-            print('h')
-            print(h)
-            out, h = self.forward_step(x, h,
-                                       encoder_outputs=encoder_outputs,
-                                       input_valid_length=input_valid_length)
+            # encoder_output=[271,512]
+            # x=[1355,]
+            # h=[1,1355,512]
+            out, h = self.step(x, h,
+                               encoder_outputs=encoder_outputs,
+                               input_valid_length=input_valid_length)
             # log_prob: [batch_size x beam_size, vocab_size]
             log_prob = tf.nn.softmax(out, axis=1)
 
@@ -184,6 +181,7 @@ class BaseRNNDecoder(tf.keras.Model):
 
         return embed
 
+
 class DecoderRNN(BaseRNNDecoder):
     def __init__(self, vocab_size, embedding_size,
                  hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
@@ -210,6 +208,7 @@ class DecoderRNN(BaseRNNDecoder):
         self.V = tf.keras.layers.Dense(1)
 
         self.out = tf.keras.layers.Dense(vocab_size)
+
 
     def forward_step(self, x, h,
                      encoder_outputs=None,
@@ -284,7 +283,7 @@ class DecoderRNN(BaseRNNDecoder):
         if not decode:
             out_list = []
             seq_len = inputs.shape[1]
-            #seq_len=50
+            # seq_len=50
             for i in range(seq_len):
                 # x: [batch_size]
                 # =>
@@ -306,7 +305,7 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h)
+                out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs)
 
                 # out: [batch_size, vocab_size]
                 # => x: [batch_size]

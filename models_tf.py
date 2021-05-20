@@ -102,17 +102,17 @@ class HRED(tf.keras.Model):
         # decoder_init=[1,275,512]
         decoder_init = tf.reshape(context_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
         # print(decoder_init.shape)
-        # if not decode:
-        #     decoder_outputs = self.decoder(target_sentences,
-        #                                    encoder_outputs=context_outputs,
-        #                                    init_h=decoder_init,
-        #                                    decode=decode)
-        #     return decoder_outputs
-        # else:
-        #     # 添加了encoder_outputs
-        prediction, final_score, length = self.decoder.beam_decode(encoder_outputs=context_outputs,
-                                                                   init_h=decoder_init)
-        return prediction
+        if not decode:
+            decoder_outputs = self.decoder(target_sentences,
+                                           encoder_outputs=context_outputs,
+                                           init_h=decoder_init,
+                                           decode=decode)
+            return decoder_outputs
+        else:
+            # 添加了encoder_outputs
+            prediction, final_score, length = self.decoder.beam_decode(encoder_outputs=context_outputs,
+                                                                       init_h=decoder_init)
+            return prediction
 
     def generate(self, context, sentence_length, n_context, input_images, input_images_length):
         batch_size = context.shape[0]
