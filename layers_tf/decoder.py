@@ -205,7 +205,7 @@ class DecoderRNN(BaseRNNDecoder):
 
         self.out = tf.keras.layers.Dense(vocab_size)
 
-    def forward_step(self, x, h,
+    def step(self, x, h,
                      encoder_outputs=None,
                      encoder_hidden=None,
                      input_valid_length=None):
