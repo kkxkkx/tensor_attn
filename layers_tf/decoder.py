@@ -234,7 +234,7 @@ class DecoderRNN(BaseRNNDecoder):
         # x: [batch_size] => [batch_size, hidden_size]
         # x=[271,] -> [271,300]
         x = self.embed(x)
-        print(x.shape)
+        # print(x.shape)
         # x=[271,1,300]
         # x = tf.expand_dims(x, 1)
         # x = [271,821]
