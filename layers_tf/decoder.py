@@ -87,7 +87,7 @@ class BaseRNNDecoder(tf.keras.Model):
             # =>
             # out: [batch_size x beam_size, vocab_size]
             # h: [num_layers, batch_size x beam_size, hidden_size]
-            out, h = self.forward_step(x, h,
+            out, h = self.step(x, h,
                                        encoder_outputs=encoder_outputs,
                                        input_valid_length=input_valid_length)
             # log_prob: [batch_size x beam_size, vocab_size]
@@ -204,6 +204,15 @@ class DecoderRNN(BaseRNNDecoder):
         self.V = tf.keras.layers.Dense(1)
 
         self.out = tf.keras.layers.Dense(vocab_size)
+
+    def forward_step(self, x, h,
+                     encoder_outputs=None,
+                     encoder_hidden=None,
+                     input_valid_length=None):
+        x = self.embed(x)
+        last_h, h = self.rnncell(x, h)
+        out = self.out(last_h)
+        return out, h  # , attention_w
 
     def forward_step(self, x, h,
                      encoder_outputs=None,

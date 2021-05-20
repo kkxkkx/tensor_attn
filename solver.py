@@ -35,6 +35,7 @@ class Solver(object):
         if self.config.checkpoint:
             self.load_model(self.config.checkpoint)
 
+
     def load_model(self, checkpoint):
         """Load parameters from checkpoint"""
         print(f'Load parameters from {checkpoint}')
