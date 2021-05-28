@@ -71,19 +71,24 @@ class HRED(tf.keras.Model):
         input_images_length = tf.reshape(input_images_length, [batch_size, -1])
         input_images = tf.slice(input_images, [0]*5, [-1, max_len]+[-1]*3)
         input_images = tf.reshape(input_images, [-1, 224, 224, 3])
+        #input_images_length=[32,9,1]
         input_images_length = tf.slice(input_images_length, [0, 0], [-1, max_len])
-
+        #input_images=[288,244,244,3]
         img_encoder_outputs = self.image_encoder(input_images)
         img_encoder_outputs = tf.reshape(img_encoder_outputs, [batch_size, max_len, -1])
         input_images_length = tf.expand_dims(input_images_length, axis=-1)
+        #img_encoder_outputs=[32,9,1024]
         img_encoder_outputs = img_encoder_outputs * input_images_length
 
+        #encoder_hidden=[277,2,512]
         if self.encoder.bidirectional:
             encoder_hidden = tf.stack(encoder_hidden, axis=1)
+
         encoder_hidden = tf.reshape(encoder_hidden, [num_sentences,-1])
 
         start = tf.cumsum(tf.concat((tf.convert_to_tensor([0], dtype=tf.float32), input_conversation_length[:-1]), 0))
 
+        # encoder_hidden=[32,9,1024]
         # encoder_hidden: [batch_size, max_len, num_layers * direction * hidden_size]
         encoder_hidden = tf.stack([pad(encoder_hidden[int(s):int(s+l)], max_len)
                                       for s, l in zip(start, input_conversation_length)], 0)
@@ -109,6 +114,7 @@ class HRED(tf.keras.Model):
                                            decode=decode)
             return decoder_outputs
         else:
+            print('beam_decode')
             prediction, final_score, length = self.decoder.beam_decode(init_h=decoder_init)
             return prediction
 
