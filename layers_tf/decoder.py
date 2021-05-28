@@ -285,7 +285,7 @@ class DecoderRNN(BaseRNNDecoder):
         h = self.init_h(batch_size, hidden=init_h)
 
         if not decode:
-            print('not decode')
+            # print('not decode')
             out_list = []
             seq_len = inputs.shape[1]
             #seq_len=50
