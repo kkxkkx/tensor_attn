@@ -285,6 +285,7 @@ class DecoderRNN(BaseRNNDecoder):
         h = self.init_h(batch_size, hidden=init_h)
 
         if not decode:
+            print('not decode')
             out_list = []
             seq_len = inputs.shape[1]
             #seq_len=50
@@ -303,14 +304,14 @@ class DecoderRNN(BaseRNNDecoder):
 
             return out
         else:
+            print('decode')
             x_list = []
             for i in range(self.max_unroll):
                 # x: [batch_size]
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                out, h = self.forward_step(x, h)
-
+                out, h = self.step(x, h)
                 # out: [batch_size, vocab_size]
                 # => x: [batch_size]
                 x = self.decode(out)
