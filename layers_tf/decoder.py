@@ -98,6 +98,7 @@ class BaseRNNDecoder(tf.keras.Model):
                                encoder_outputs=encoder_outputs,
                                input_valid_length=input_valid_length)
             # log_prob: [batch_size x beam_size, vocab_size]
+            fo.write('log_prob\n')
             log_prob = tf.nn.softmax(out, axis=1)
 
             # [batch_size x beam_size]
@@ -112,7 +113,7 @@ class BaseRNNDecoder(tf.keras.Model):
             # score: [batch_size, beam_size]
             # top_k_idx: [batch_size, beam_size]
             #       each element of top_k_idx [0 ~ beam x vocab)
-
+            fo.write('top_k\n')
             score, top_k_idx = tf.math.top_k(tf.reshape(score, [batch_size, -1]), self.beam_size)
 
             # Get token ids with remainder after dividing by top_k_idx
