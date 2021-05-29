@@ -119,6 +119,8 @@ class HRED(tf.keras.Model):
             return prediction
 
     def generate(self, context, sentence_length, n_context, input_images, input_images_length):
+        fo = open('log.txt', "w")
+        fo.write('generate\n')
         batch_size = context.shape[0]
         samples = []
 
@@ -146,8 +148,10 @@ class HRED(tf.keras.Model):
             # context_outputs: [batch_size, context_hidden_size * direction]
             context_outputs = tf.squeeze(context_outputs, 1)
             decoder_init = tf.reshape(context_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
+            fo.write('beam_decode\n')
             prediction, final_score, length = self.decoder.beam_decode(init_h=decoder_init)
             # prediction: [batch_size, seq_len]
+            fo.write('prediction\n')
             prediction = prediction[:, 0, :] #选最好的
             # length: [batch_size]
             length = [l[0] for l in length]
@@ -161,7 +165,7 @@ class HRED(tf.keras.Model):
 
             context_outputs, context_hidden = self.context_encoder.step(comb_encoder_hidden,
                                                                         context_hidden)
-
+        fo.close()
         samples = tf.stack(samples, 1)
         return samples
 
