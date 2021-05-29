@@ -89,9 +89,9 @@ class BaseRNNDecoder(tf.keras.Model):
             # out: [batch_size x beam_size, vocab_size]
             # h: [num_layers, batch_size x beam_size, hidden_size]
             fo.write('x:')
-            fo.write(x)
+            fo.write(x.size())
             fo.write('     h:')
-            fo.write(h)
+            fo.write(h.size())
             fo.write('\n')
             fo.write('step\n')
             out, h = self.step(x, h,
@@ -306,9 +306,9 @@ class DecoderRNN(BaseRNNDecoder):
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
                 fo.write('x:')
-                fo.write(x)
+                fo.write(x.size())
                 fo.write('     h:')
-                fo.write(h)
+                fo.write(h.size())
                 fo.write('\n')
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs)
                 out_list.append(out)
@@ -328,9 +328,9 @@ class DecoderRNN(BaseRNNDecoder):
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
                 fo.write('x:')
-                fo.write(x)
+                fo.write(x.size())
                 fo.write('     h:')
-                fo.write(h)
+                fo.write(h.size())
                 fo.write('\n')
                 out, h = self.step(x, h)
                 # out: [batch_size, vocab_size]
