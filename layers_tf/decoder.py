@@ -81,15 +81,22 @@ class BaseRNNDecoder(tf.keras.Model):
             self.beam_size,
             self.max_unroll,
             batch_position)
-
+        fo = open('log.txt', "w")
+        fo.write("\nBeam Search\n")
         for i in range(self.max_unroll):
             # x: [batch_size x beam_size]; (token index)
             # =>
             # out: [batch_size x beam_size, vocab_size]
             # h: [num_layers, batch_size x beam_size, hidden_size]
+            fo.write('x:')
+            fo.write(x)
+            fo.write('     h:')
+            fo.write(h)
+            fo.write('\n')
+            fo.write('step\n')
             out, h = self.step(x, h,
-                                       encoder_outputs=encoder_outputs,
-                                       input_valid_length=input_valid_length)
+                               encoder_outputs=encoder_outputs,
+                               input_valid_length=input_valid_length)
             # log_prob: [batch_size x beam_size, vocab_size]
             log_prob = tf.nn.softmax(out, axis=1)
 
@@ -144,7 +151,7 @@ class BaseRNNDecoder(tf.keras.Model):
         #     A list specifying the length of each sequence in the top-k candidates
         # prediction, final_score, length = beam.backtrack()
         prediction, final_score, length = beam.backtrack()
-
+        fo.close()
         return prediction, final_score, length
 
     def decode(self, out):
@@ -178,6 +185,7 @@ class BaseRNNDecoder(tf.keras.Model):
 
         return embed
 
+
 class DecoderRNN(BaseRNNDecoder):
     def __init__(self, vocab_size, embedding_size,
                  hidden_size, rnncell=tf.keras.layers.GRUCell, num_layers=1,
@@ -206,9 +214,9 @@ class DecoderRNN(BaseRNNDecoder):
         self.out = tf.keras.layers.Dense(vocab_size)
 
     def step(self, x, h,
-                     encoder_outputs=None,
-                     encoder_hidden=None,
-                     input_valid_length=None):
+             encoder_outputs=None,
+             input_valid_length=None):
+        print('step')
         x = self.embed(x)
         last_h, h = self.rnncell(x, h)
         out = self.out(last_h)
@@ -274,7 +282,10 @@ class DecoderRNN(BaseRNNDecoder):
                         init_h: (Variable, FloatTensor): [num_layers, batch_size, hidden_size]
                     Return:
                         out   : [batch_size, seq_len]
+
                 """
+        fo = open('log.txt', "w")
+
         # decoder_init = tf.reshape(encoder_outputs, [self.decoder.num_layers, -1, self.decoder.hidden_size])
         batch_size = self.batch_size(inputs, init_h)
 
@@ -285,15 +296,20 @@ class DecoderRNN(BaseRNNDecoder):
         h = self.init_h(batch_size, hidden=init_h)
 
         if not decode:
-            # print('not decode')
+            fo.write('not decode\n')
             out_list = []
             seq_len = inputs.shape[1]
-            #seq_len=50
+            # seq_len=50
             for i in range(seq_len):
                 # x: [batch_size]
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
+                fo.write('x:')
+                fo.write(x)
+                fo.write('     h:')
+                fo.write(h)
+                fo.write('\n')
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs)
                 out_list.append(out)
                 x = inputs[:, i]
@@ -304,13 +320,18 @@ class DecoderRNN(BaseRNNDecoder):
 
             return out
         else:
-            print('decode')
+            fo.write('decode:\n')
             x_list = []
             for i in range(self.max_unroll):
                 # x: [batch_size]
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
+                fo.write('x:')
+                fo.write(x)
+                fo.write('     h:')
+                fo.write(h)
+                fo.write('\n')
                 out, h = self.step(x, h)
                 # out: [batch_size, vocab_size]
                 # => x: [batch_size]
@@ -318,6 +339,7 @@ class DecoderRNN(BaseRNNDecoder):
                 x_list.append(x)
 
             # [batch_size, max_target_len]
+            fo.close()
             return tf.stack(x_list, axis=1)
 
 
