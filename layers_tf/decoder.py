@@ -88,11 +88,11 @@ class BaseRNNDecoder(tf.keras.Model):
             # =>
             # out: [batch_size x beam_size, vocab_size]
             # h: [num_layers, batch_size x beam_size, hidden_size]
-            fo.write('x:')
-            fo.write(x.size())
-            fo.write('     h:')
-            fo.write(h.size())
-            fo.write('\n')
+            # fo.write('x:')
+            # fo.write(x.size())
+            # fo.write('     h:')
+            # fo.write(h.size())
+            # fo.write('\n')
             fo.write('step\n')
             out, h = self.step(x, h,
                                encoder_outputs=encoder_outputs,
@@ -136,7 +136,7 @@ class BaseRNNDecoder(tf.keras.Model):
 
             # Update sequence scores at beam
             beam.update(score, top_k_pointer, x)  # , h)
-
+            fo.close()
             # Erase scores for EOS so that they are not expanded
             # [batch_size, beam_size]
             eos_idx = tf.reshape(tf.math.equal(x, EOS_ID), [batch_size, self.beam_size])
@@ -305,11 +305,12 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                fo.write('x:')
-                fo.write(x.size())
-                fo.write('     h:')
-                fo.write(h.size())
-                fo.write('\n')
+                # fo.write('x:')
+                # fo.write(x.size())
+                # fo.write('     h:')
+                # fo.write(h.size())
+                # fo.write('\n')
+                fo.write('forward_step\n')
                 out, h = self.forward_step(x, h, encoder_outputs=encoder_outputs)
                 out_list.append(out)
                 x = inputs[:, i]
@@ -327,11 +328,12 @@ class DecoderRNN(BaseRNNDecoder):
                 # =>
                 # out: [batch_size, vocab_size]
                 # h: [num_layers, batch_size, hidden_size] (h and c from all layers)
-                fo.write('x:')
-                fo.write(x.size())
-                fo.write('     h:')
-                fo.write(h.size())
-                fo.write('\n')
+                # fo.write('x:')
+                # fo.write(x.size())
+                # fo.write('     h:')
+                # fo.write(h.size())
+                # fo.write('\n')
+                fo.write('step\n')
                 out, h = self.step(x, h)
                 # out: [batch_size, vocab_size]
                 # => x: [batch_size]
